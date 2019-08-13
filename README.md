@@ -15,8 +15,11 @@ The slide show (utilizing feh) is built upon standard graphic images (JPEG/PNG/T
 
 # Links:
 NGINX Webserver - http://www.nginx.org
+
 Raspberry PI ASCII Webpage - https://gist.github.com/spfaffly/d774f87b8cf9a1837d05
+
 Dropbox-Uploader - https://github.com/andreafabrizi/Dropbox-Uploader
+
 Webmin - http://www.webmin.com
 
 ## Getting started
