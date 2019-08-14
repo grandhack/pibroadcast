@@ -63,3 +63,11 @@ This will install the system and customize the installed software.  This will al
 9.  Once client is installed:
     - Verify connection to server is up and begin broadcast on server (thru Server Menu)
     - Verify client has synced dropbox folders/pictures from server
+    
+## Future Growth
+Development needed:
+ - Integrate with:
+   * Google Drive
+   * Box.net
+   * Remote server
+ - Other forms of media streaming to server from external sources
