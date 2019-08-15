@@ -1,17 +1,17 @@
 
 # Pi Broadcast 
 
-Pi Broadcast was built to utilize Raspberry Pi’s to play a continual slide show and automatically detect when a live broadcast has begun and switch the video feed from slide show to video feed.
+Pi Broadcast was built to utilize Raspberry Pi’s to play a continual slide show and automatically detect when a live broadcast has begun and switch the video feed from slide show to video feed.  The clients detect when the server has started a broadcast, and switch feeds automatically.  Once the broadcast is concluded on the server and the feed is turned off, the clients switch back to the slideshow automatically.  If at anytime the live feed is dropped on a client, the slideshow is always running in the background and will be seen instead of a plain desktop or error screen.
 
 This has been written to work on the [x86](https://www.raspberrypi.org/downloads/raspberry-pi-desktop/) and [ARM](https://www.raspberrypi.org/downloads/raspbian/) architecture of Raspbian.
 
 Pi Broadcast was written in ***BASH***
 
-The clients will play the video at the same time based on the UDP protocol.  You can run an unlimited amount of clients.  Any number of clients that can detect/play a UDP broadcast can be used.  It was tested with VLC on (IOS/MacOS/Windows 10/Android).
+The clients will play the video at the same time.  You can run an unlimited amount of clients.  Any number of clients that can detect/play a RTMP broadcast can be used.  It was tested with VLC on (IOS/MacOS/Windows 10/Android).
 
-The omxplayer (at the time) was the only player specifically designed to take advantage of the pi’s decoder chipset.  It was tested on Pi 3 / 3B+ / Pi Zero W.
+The omxplayer (at the time) was the only player specifically designed to take advantage of the pi’s decoder chipset.  It was tested on Pi 3 / 3B+ / Pi Zero W and Raspbian x86.
 
-The slide show (utilizing feh) is built upon standard graphic images (JPEG/PNG/TIFF/GIF).  The images are downloaded from the server upon boot.  The pictures can be pushed from the server manually, or from the client manually.  The slideshows can be individualized to each client based on name (EntrancePi1/2/3 will play a different slide show then EastPi1 and WestPi2). 
+The slide show (utilizing feh) is built upon standard graphic images (JPEG/PNG/TIFF/GIF).  The images are downloaded from the server upon boot.  The pictures can be pushed from the server manually, or downloaded to the client manually.  The slideshows can be individualized to each client based on name (EntrancePi1/2/3) will play a different slide show then EastPi1 and WestPi2. 
 
 Server and Clients are driven by Whiptail menus.  To begin, open a terminal window and the menu should automatically run.  If it does not, or you are running a headless server run:
 ```
