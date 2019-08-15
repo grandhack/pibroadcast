@@ -41,7 +41,7 @@ Webmin - http://www.webmin.com (This is installed purely for ease of administrat
 ## Getting started
 1. Download/Install Raspbian
 2. Clone/Download zip pibroadcast from Github
-3.  Place pibroadcast in the /boot folder on the fresh install of Raspbian
+3.  Place the unzipped pibroadcast in the /boot folder on the fresh install of Raspbian
     - Customize wpa_supplicant.conf as applicable if using WiFi
     - Customize fresh_install.sh with:
       * Dropbox Token and folder architechure
