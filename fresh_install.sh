@@ -201,9 +201,9 @@ do
 	        esac
 done
 
-echo "#############################################" >> 2>&1 $LOGFILE
+echo "#############################################" >> $LOGFILE 2>&1
 echo "##  Start/Enable/Edit ssh/sudo on boot up  ##" | tee -a $LOGFILE
-echo "#############################################" >> 2>&1 $LOGFILE
+echo "#############################################" >> $LOGFILE 2>&1
 echo | tee -a $LOGFILE
 systemctl enable ssh | tee -a $LOGFILE
 systemctl start ssh | tee -a $LOGFILE
