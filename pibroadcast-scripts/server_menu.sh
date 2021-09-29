@@ -30,7 +30,7 @@ L_DIR=/smb_shares
 connected_host_ip=$(sudo smbstatus -fb | awk 'FNR > 4 {print $4 $5}')
 connected_host_ip1=$(ls /smb_shares/watch_folder/*.pid | gawk -F/ '{print $4}' | gawk -F. '{print $1}')
 #pibroadcast_version=$(grep pibroadcast_version /home/pi/.pibroadcast_settings | awk '{print $2}')
-pibroadcast_version="1.3"
+pibroadcast_version="1.3.1"
 
 export LC_ALL=C
 
@@ -236,7 +236,8 @@ function advancedMenu() {
 		##
 		echo --
 		echo "Current Connected Clients:"
-		    	#for i in $connected_host_ip
+		    	cat /smb_shares/watch_folder/*.pid | awk -F -- '{print "   "$2" -- "$3}'
+			#for i in $connected_host_ip
 				
 			#	do
         				
