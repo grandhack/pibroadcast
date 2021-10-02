@@ -463,15 +463,15 @@ rtmp {
 	chown nobody:root -R /var/www/*
 	rm -rf /home/pi/nginx-build
 	
-	echo "######################" | tee -a $LOGFILE
-	echo "##  Webmin Install  ##" | tee -a $LOGFILE
-	echo "######################" | tee -a $LOGFILE
+	#echo "######################" | tee -a $LOGFILE
+	#echo "##  Webmin Install  ##" | tee -a $LOGFILE
+	#echo "######################" | tee -a $LOGFILE
 
-	wget --directory-prefix=/home/pi/install-packages/ http://www.webmin.com/download/deb/webmin-current.deb | tee -a $LOGFILE
-	dpkg -i /home/pi/install-packages/webmin-current.deb | tee -a $LOGFILE
+	#wget --directory-prefix=/home/pi/install-packages/ http://www.webmin.com/download/deb/webmin-current.deb | tee -a $LOGFILE
+	#dpkg -i /home/pi/install-packages/webmin-current.deb | tee -a $LOGFILE
 
 	#rm -rf /home/pi/install-packages | tee -a $LOGFILE
-	mkdir -p /smb_shares/watch_folder/syncd_clients | tee -a $LOGFILE
+	#mkdir -p /smb_shares/watch_folder/syncd_clients | tee -a $LOGFILE
 	mkdir /smb_shares/scripts | tee -a $LOGFILE
 	mkdir /smb_shares/slides | tee -a $LOGFILE
 
