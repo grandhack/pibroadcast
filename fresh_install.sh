@@ -5,8 +5,8 @@
 #title          :fresh_install.sh
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
-#date           :Sept 16 2018
-#version        :3.2    
+#date           :Oct 2 2021
+#version        :3.2.1    
 #usage		:sudo /boot/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -305,10 +305,10 @@ if [ $opt = ServerPi ]; then
 	echo "######################" | tee -a $LOGFILE
 	
 	apt-get update | tee -a $LOGFILE
-	apt-get install -y rsync samba vlc build-essential libpcre3 libpcre3-dev libssl-dev libpcre++-dev zlib1g-dev libcurl4-openssl-dev libnet-ssleay-perl libauthen-pam-perl libio-pty-perl apt-show-versions samba bind9 webalizer locate mysql-server nmap nginx | tee -a $LOGFILE
+	apt-get install -y libssl-devlibpcre3 libpcre3-dev rsync samba vlc build-essential libpcre3 libpcre3-dev libssl-dev libpcre++-dev zlib1g-dev libcurl4-openssl-dev libnet-ssleay-perl libauthen-pam-perl libio-pty-perl apt-show-versions samba bind9 webalizer locate mysql-server nmap nginx | tee -a $LOGFILE
 	apt-get upgrade -y | tee -a $LOGFILE
 	mkdir /home/pi/install-packages | tee -a $LOGFILE
-	printf 'pibroadcast_version 1.3\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Settings File ##
+	printf 'pibroadcast_version 1.3.1\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Settings File ##
 	printf 'log_upload true\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Settings File ##
 
 	echo "#####################" | tee -a $LOGFILE
@@ -319,12 +319,13 @@ if [ $opt = ServerPi ]; then
 	sudo apt-get clean nginx -y
 	mkdir /home/pi/nginx-build
 	cd /home/pi/nginx-build
-	wget http://nginx.org/download/nginx-1.14.0.tar.gz
-	wget https://github.com/arut/nginx-rtmp-module/archive/master.zip
+	wget http://nginx.org/download/nginx-1.21.3.tar.gz
+	#wget https://github.com/arut/nginx-rtmp-module/archive/master.zip
+	git clone https://github.com/arut/nginx-rtmp-module
 	tar -zxvf nginx-*tar.gz
-	unzip master.zip
-	cd /home/pi/nginx-build/nginx-1.14.0
-	./configure --prefix=/var/www --sbin-path=/usr/sbin/nginx  --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_ssl_module --without-http_proxy_module --add-module=/home/pi/nginx-build/nginx-rtmp-module-master | tee -a $LOGFILE
+	#unzip master.zip--without-http_rewrite_module
+	cd /home/pi/nginx-build/nginx-1.21.3
+	./configure --prefix=/var/www --sbin-path=/usr/sbin/nginx  --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_ssl_module --without-http_proxy_module --add-module=/home/pi/nginx-build/nginx-rtmp-module | tee -a $LOGFILE
 
 	make -j4 | tee -a $LOGFILE
 	sudo make -j4 install | tee -a $LOGFILE
