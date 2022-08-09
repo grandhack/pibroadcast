@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 9 2022
-#version        :3.3.0 alpha    
+#version        :3.3.0 alpha.2
 #usage		:sudo /boot/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -26,6 +26,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #==============================================================================
+
+## Testing for being run as root ##
+if [ "$(id -un)" != "root" ]; then
+    echo "You must be root to run this....exiting"
+    exit
+fi
 
 ##  Testing architecture for virtual environment settings  ##
 arch_test=$(uname -m)
@@ -52,7 +58,7 @@ piadminpasswd="pibroadcast"
 
 serveruser="piadmin"
 serveruserpasswd="pibroadcast"
-dropbox_access_token="OAUTH_ACCESS_TOKEN=INSERT_YOUR_TOKEN_HERE"
+
 
 
 
@@ -66,7 +72,8 @@ export LC_TELEPHONE=en_US.UTF-8
 export LC_MEASUREMENT=en_US.UTF-8
 export LC_IDENTIFICATION=en_US.UTF-8
 export LC_ALL=C
-currentuser=`piadmin`
+currentuser=`whoami`
+
 
 echo "#####################################" | tee -a $LOGFILE
 echo "##      Fresh/Re Install Test      ##" | tee -a $LOGFILE
@@ -97,6 +104,7 @@ else [ $arch -eq 0 ] 				##  For x86 VM  ##
 			sudo sed -i "s/$hostn/raspberry/g" /etc/hosts | tee -a $LOGFILE
 	fi
 fi
+
 
 echo "############################" | tee -a $LOGFILE
 echo "##      Network Test      ##" | tee -a $LOGFILE
@@ -187,6 +195,18 @@ do
 			       	echo "Updated /etc/hostname and /etc/hosts with $opt" | tee -a $LOGFILE
 				sudo sed -i "s/$hostn/$opt/g" /etc/hostname | tee -a $LOGFILE
 				sudo sed -i "s/$hostn/$opt/g" /etc/hosts | tee -a $LOGFILE
+				
+				while true; do
+    					read -p "Do you wish to use Dropbox Syncing (y/n)? " yn
+    					case $yn in
+        					[Yy]* ) read -p "Paste OAUTH ACCESS TOKEN here: " dropbox_token; dropbox_access_token=$dropbox_token; dropbox_option=0; break;;
+        					[Nn]* ) dropbox_option=1; break;;
+        					* ) echo "Please answer yes or no.";;
+    					esac
+				done
+				echo OAUTH ACCESS TOKEN $dropbox_access_token $dropbox_option  ## Used for troubleshooting ##
+				exit  ## Used for troubleshooting ##
+
 				echo | tee -a $LOGFILE
 				break;;
 			's') echo "Skip"
