@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 9 2022
-#version        :3.3.0 alpha.2
+#version        :3.3.0 alpha.3
 #usage		:sudo /boot/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -199,13 +199,13 @@ do
 				while true; do
     					read -p "Do you wish to use Dropbox Syncing (y/n)? " yn
     					case $yn in
-        					[Yy]* ) read -p "Paste OAUTH ACCESS TOKEN here: " dropbox_token; dropbox_access_token=$dropbox_token; dropbox_option=0; break;;
-        					[Nn]* ) dropbox_option=1; break;;
+        					[Yy]* ) read -p "Paste OAUTH ACCESS TOKEN here: " dropbox_token; dropbox_access_token=$dropbox_token; dropbox_enabled=0; break;;
+        					[Nn]* ) dropbox_enabled=1; break;;
         					* ) echo "Please answer yes or no.";;
     					esac
 				done
 				echo OAUTH ACCESS TOKEN $dropbox_access_token $dropbox_option  ## Used for troubleshooting ##
-				exit  ## Used for troubleshooting ##
+				#exit  ## Used for troubleshooting ##
 
 				echo | tee -a $LOGFILE
 				break;;
@@ -571,7 +571,8 @@ rtmp {
 	echo | tee -a $LOGFILE
 
 	
-	
+	if [ $dropbox_enabled -eq 0 ]; then
+ 	
 	echo "###########################################" | tee -a $LOGFILE
 	echo "##  Install/Syncing Dropbox with Server  ##" | tee -a $LOGFILE
 	echo "###########################################" | tee -a $LOGFILE
@@ -594,6 +595,8 @@ rtmp {
 	sudo chmod 755 -R /smb_shares/slides/
 
 	printf 'log_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Server Settings File ##
+
+	fi
 
 	echo "#######################################################" | tee -a $LOGFILE
 	echo "##  Moving scripts folder from /boot and cleaning up ##" | tee -a $LOGFILE
