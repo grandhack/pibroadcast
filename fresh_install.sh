@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.13
+#version        :3.3.0 alpha.14
 #usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -284,8 +284,11 @@ echo "Creating piadmin user" >> $LOGFILE
 sudo useradd -m -G sudo -p $(echo $piadminpasswd | openssl passwd -1 -stdin) -s /bin/bash piadmin | tee -a $LOGFILE
 echo "Changing $currentuser user password" >> $LOGFILE
 sudo usermod --password $pipasswd $currentuser | tee -a $LOGFILE
-echo "$currentuser:$pipasswd" | sudo chpasswd
+#echo "$currentuser:$pipasswd" | sudo chpasswd
+echo "$serveruser:$serveruserpasswd" | sudo chpasswd
 echo | tee -a $LOGFILE
+
+exit
 
 echo "###############################################" | tee -a $LOGFILE
 echo "## Start system update and software removal  ##"  | tee -a $LOGFILE
