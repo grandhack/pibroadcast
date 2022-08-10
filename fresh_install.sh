@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.16
+#version        :3.3.0 alpha.17
 #usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -688,7 +688,7 @@ else	## For Clients ##
 	echo "##  Setting up /etc/rc.local to start client_services.sh  ##" | tee -a $LOGFILE
 	echo "############################################################" | tee -a $LOGFILE
 	sed -i '/fi/a /home/$currentuser/local_sync/scripts/client_services.sh & ' /etc/rc.local | tee -a $LOGFILE
-	cp `pwd`/pibroadcast-scripts/client_services.sh /home/$currentuser/local_sync/scripts/client_services.sh | tee -a $LOGFILE  ## Added as a temp fix ##
+	cp `pwd`/pibroadcast/pibroadcast-scripts/client_services.sh /home/$currentuser/local_sync/scripts/client_services.sh | tee -a $LOGFILE  ## Added as a temp fix ##
 	echo | tee -a $LOGFILE
 
 
@@ -721,11 +721,11 @@ else	## For Clients ##
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
 
-	mv `pwd`/pibroadcast-scripts/client_menu.sh /home/$currentuser/.bashrc
+	mv `pwd`/pibroadcast/pibroadcast-scripts/client_menu.sh /home/$currentuser/.bashrc
 	chown $currentuser:$currentuser /home/$currentuser/.bashrc
 	chown -R $currentuser:$currentuser /home/$currentuser/
 	printf 'feh 10\nserver_sync true\nsync_scripts true\nsync_slides true\nbroadcast_watch true\nclient_pid_create true\nlog_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Client Settings File ##
-	rm -rf `pwd`/pibroadcast/pibroadcast-scripts
+	rm -rf `pwd`/pibroadcast/pibroadcast/pibroadcast-scripts
 	
 
 fi
@@ -737,11 +737,11 @@ rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh | tee -a $LOGFILE  	##  Remove info popu
 #rm /home/$currentuser/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
 apt-get autoremove -y | tee -a $LOGFILE 			##  Doing a final cleanup of system before reboot  ##
 apt-get purge -y  						##  Doing a final cleanup of system before reboot  ##
-#rm `pwd`/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
+#rm `pwd`/pibroadcast/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
 
 echo "###################" | tee -a $LOGFILE
 echo "##  Rebooting Pi ##"  | tee -a $LOGFILE
 echo "###################" | tee -a $LOGFILE
 #reboot  | tee -a $LOGFILE
 
-#exit
+exit
