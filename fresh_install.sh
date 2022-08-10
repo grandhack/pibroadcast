@@ -288,7 +288,6 @@ sudo usermod --password $pipasswd $currentuser | tee -a $LOGFILE
 echo "$serveruser:$serveruserpasswd" | sudo chpasswd
 echo | tee -a $LOGFILE
 
-exit
 
 echo "###############################################" | tee -a $LOGFILE
 echo "## Start system update and software removal  ##"  | tee -a $LOGFILE
