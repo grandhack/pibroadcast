@@ -332,7 +332,7 @@ if [ $opt = ServerPi ]; then
 	echo "######################" | tee -a $LOGFILE
 	
 	apt-get update | tee -a $LOGFILE
-	apt-get install -y libpcre3 libpcre3-dev libpcre16-3 libpcre32-3 libpcrecpp0v5 rsync samba vlc build-essential libssl-dev libpcre++-dev zlib1g-dev libcurl4-openssl-dev libnet-ssleay-perl libauthen-pam-perl libio-pty-perl apt-show-versions samba bind9 locate nmap nginx | tee -a $LOGFILE
+	apt-get install -y gawk libsigsegv2 libpcre3 libpcre3-dev libpcre16-3 libpcre32-3 libpcrecpp0v5 rsync samba vlc build-essential libssl-dev libpcre++-dev zlib1g-dev libcurl4-openssl-dev libnet-ssleay-perl libauthen-pam-perl libio-pty-perl apt-show-versions samba bind9 locate nmap nginx | tee -a $LOGFILE
 	apt-get upgrade -y | tee -a $LOGFILE
 	mkdir /home/$currentuser/install-packages | tee -a $LOGFILE
 	printf 'pibroadcast_version 1.3.1\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Settings File ##
