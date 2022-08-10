@@ -5,9 +5,9 @@
 #title          :fresh_install.sh
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
-#date           :Oct 2 2021
-#version        :3.2.1    
-#usage		:sudo /boot/fresh_install.sh
+#date           :Aug 10 2022
+#version        :3.3.0 alpha.14
+#usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
 #==============================================================================
@@ -26,6 +26,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #==============================================================================
+
+## Testing for being run as root ##
+if [ "$(id -un)" != "root" ]; then
+    echo "You must be root to run this....exiting"
+    exit
+fi
 
 ##  Testing architecture for virtual environment settings  ##
 arch_test=$(uname -m)
@@ -52,8 +58,12 @@ piadminpasswd="pibroadcast"
 
 serveruser="piadmin"
 serveruserpasswd="pibroadcast"
-dropbox_access_token="OAUTH_ACCESS_TOKEN=INSERT_YOUR_TOKEN_HERE"
 
+starting_install_directory=`pwd`
+
+## Used for troubleshooting ##
+echo Starting Install Directory: $starting_install_directory
+## Used for troubleshooting ##
 
 
 export LANG=en_US.UTF-8
@@ -66,6 +76,8 @@ export LC_TELEPHONE=en_US.UTF-8
 export LC_MEASUREMENT=en_US.UTF-8
 export LC_IDENTIFICATION=en_US.UTF-8
 export LC_ALL=C
+currentuser="piadmin"
+
 
 echo "#####################################" | tee -a $LOGFILE
 echo "##      Fresh/Re Install Test      ##" | tee -a $LOGFILE
@@ -96,6 +108,7 @@ else [ $arch -eq 0 ] 				##  For x86 VM  ##
 			sudo sed -i "s/$hostn/raspberry/g" /etc/hosts | tee -a $LOGFILE
 	fi
 fi
+
 
 echo "############################" | tee -a $LOGFILE
 echo "##      Network Test      ##" | tee -a $LOGFILE
@@ -186,6 +199,18 @@ do
 			       	echo "Updated /etc/hostname and /etc/hosts with $opt" | tee -a $LOGFILE
 				sudo sed -i "s/$hostn/$opt/g" /etc/hostname | tee -a $LOGFILE
 				sudo sed -i "s/$hostn/$opt/g" /etc/hosts | tee -a $LOGFILE
+				
+				while true; do
+    					read -p "Do you wish to use Dropbox Syncing (y/n)? " yn
+    					case $yn in
+        					[Yy]* ) read -p "Paste OAUTH ACCESS TOKEN here: " dropbox_token; dropbox_access_token=$dropbox_token; dropbox_enabled=0; break;;
+        					[Nn]* ) dropbox_enabled=1; break;;
+        					* ) echo "Please answer yes or no.";;
+    					esac
+				done
+				echo OAUTH ACCESS TOKEN $dropbox_access_token $dropbox_option  ## Used for troubleshooting ##
+				#exit  ## Used for troubleshooting ##
+
 				echo | tee -a $LOGFILE
 				break;;
 			's') echo "Skip"
@@ -200,6 +225,7 @@ do
 				;;
 	        esac
 done
+
 
 echo "#############################################" >> $LOGFILE 2>&1
 echo "##  Start/Enable/Edit ssh/sudo on boot up  ##" | tee -a $LOGFILE
@@ -251,16 +277,17 @@ cp /usr/share/zoneinfo/America/New_York /etc/localtime | tee -a $LOGFILE
 echo | tee -a $LOGFILE
 
 
-
 echo "####################################" | tee -a $LOGFILE
 echo "##  Change/Create pi/piadmin user ##" | tee -a $LOGFILE
 echo "####################################" | tee -a $LOGFILE
 echo "Creating piadmin user" >> $LOGFILE
 sudo useradd -m -G sudo -p $(echo $piadminpasswd | openssl passwd -1 -stdin) -s /bin/bash piadmin | tee -a $LOGFILE
-echo "Changing pi user password" >> $LOGFILE
-sudo usermod --password $pipasswd pi | tee -a $LOGFILE
-Echo "pi:$pipasswd" | sudo chpasswd
+echo "Changing $currentuser user password" >> $LOGFILE
+sudo usermod --password $pipasswd $currentuser | tee -a $LOGFILE
+#echo "$currentuser:$pipasswd" | sudo chpasswd
+echo "$serveruser:$serveruserpasswd" | sudo chpasswd
 echo | tee -a $LOGFILE
+
 
 echo "###############################################" | tee -a $LOGFILE
 echo "## Start system update and software removal  ##"  | tee -a $LOGFILE
@@ -269,7 +296,7 @@ echo | tee -a $LOGFILE
 rm /usr/share/raspi-ui-overrides/applications/python-games.desktop
 rm /usr/share/raspi-ui-overrides/applications/raspi_resources.desktop
 rm /usr/share/raspi-ui-overrides/applications/magpi.desktop
-rm -rf /home/pi/python_games
+rm -rf /home/$currentuser/python_games
 
 echo "########################" | tee -a $LOGFILE
 echo "## Disable Bluetooth  ##" | tee -a $LOGFILE
@@ -305,11 +332,18 @@ if [ $opt = ServerPi ]; then
 	echo "######################" | tee -a $LOGFILE
 	
 	apt-get update | tee -a $LOGFILE
-	apt-get install -y libssl-devlibpcre3 libpcre3-dev rsync samba vlc build-essential libpcre3 libpcre3-dev libssl-dev libpcre++-dev zlib1g-dev libcurl4-openssl-dev libnet-ssleay-perl libauthen-pam-perl libio-pty-perl apt-show-versions samba bind9 webalizer locate mysql-server nmap nginx | tee -a $LOGFILE
+	apt-get install -y gawk libsigsegv2 libpcre3 libpcre3-dev libpcre16-3 libpcre32-3 libpcrecpp0v5 rsync samba vlc build-essential libssl-dev libpcre++-dev zlib1g-dev libcurl4-openssl-dev libnet-ssleay-perl libauthen-pam-perl libio-pty-perl apt-show-versions samba bind9 locate nmap nginx | tee -a $LOGFILE
 	apt-get upgrade -y | tee -a $LOGFILE
-	mkdir /home/pi/install-packages | tee -a $LOGFILE
-	printf 'pibroadcast_version 1.3.1\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Settings File ##
-	printf 'log_upload true\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Settings File ##
+	mkdir /home/$currentuser/install-packages | tee -a $LOGFILE
+	printf 'pibroadcast_version 1.3.1\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Settings File ##
+	printf 'log_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Settings File ##
+
+
+	## Used for Troubleshooting ##
+	echo "################################"
+	echo "## Current User: $currentuser ##"
+	echo "################################"
+	## Used for Troubleshooting ##
 
 	echo "#####################" | tee -a $LOGFILE
 	echo "##  nginx Install  ##" | tee -a $LOGFILE
@@ -317,15 +351,15 @@ if [ $opt = ServerPi ]; then
 
 	sudo apt-get remove nginx -y
 	sudo apt-get clean nginx -y
-	mkdir /home/pi/nginx-build
-	cd /home/pi/nginx-build
+	mkdir /home/$currentuser/nginx-build
+	cd /home/$currentuser/nginx-build
 	wget http://nginx.org/download/nginx-1.21.3.tar.gz
 	#wget https://github.com/arut/nginx-rtmp-module/archive/master.zip
 	git clone https://github.com/arut/nginx-rtmp-module
 	tar -zxvf nginx-*tar.gz
 	#unzip master.zip--without-http_rewrite_module
-	cd /home/pi/nginx-build/nginx-1.21.3
-	./configure --prefix=/var/www --sbin-path=/usr/sbin/nginx  --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_ssl_module --without-http_proxy_module --add-module=/home/pi/nginx-build/nginx-rtmp-module | tee -a $LOGFILE
+	cd /home/$currentuser/nginx-build/nginx-1.21.3
+	./configure --prefix=/var/www --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_ssl_module --without-http_proxy_module --add-module=/home/$currentuser/nginx-build/nginx-rtmp-module | tee -a $LOGFILE
 
 	make -j4 | tee -a $LOGFILE
 	sudo make -j4 install | tee -a $LOGFILE
@@ -462,19 +496,26 @@ rtmp {
                 }
         }" > /etc/nginx/nginx.conf | tee -a $LOGFILE
 	chown nobody:root -R /var/www/*
-	rm -rf /home/pi/nginx-build
+	cd /home/$currentuser
+	rm -rf /home/$currentuser/nginx-build
 	
+	## Used for Troubleshooting ##
+	echo "################################"
+	echo "## Current User: $currentuser ##"
+	echo "################################"
+	## Used for Troubleshooting ##
+
 	#echo "######################" | tee -a $LOGFILE
 	#echo "##  Webmin Install  ##" | tee -a $LOGFILE
 	#echo "######################" | tee -a $LOGFILE
 
-	#wget --directory-prefix=/home/pi/install-packages/ http://www.webmin.com/download/deb/webmin-current.deb | tee -a $LOGFILE
-	#dpkg -i /home/pi/install-packages/webmin-current.deb | tee -a $LOGFILE
+	#wget --directory-prefix=/home/$currentuser/install-packages/ http://www.webmin.com/download/deb/webmin-current.deb | tee -a $LOGFILE
+	#dpkg -i /home/$currentuser/install-packages/webmin-current.deb | tee -a $LOGFILE
 
-	#rm -rf /home/pi/install-packages | tee -a $LOGFILE
-	#mkdir -p /smb_shares/watch_folder/syncd_clients | tee -a $LOGFILE
-	mkdir /smb_shares/scripts | tee -a $LOGFILE
-	mkdir /smb_shares/slides | tee -a $LOGFILE
+	#rm -rf /home/$currentuser/install-packages | tee -a $LOGFILE
+	mkdir -p /smb_shares/watch_folder/syncd_clients | tee -a $LOGFILE
+	mkdir -p /smb_shares/scripts | tee -a $LOGFILE
+	mkdir -p /smb_shares/slides | tee -a $LOGFILE
 
 		
 	echo "####################################" | tee -a $LOGFILE
@@ -537,7 +578,7 @@ rtmp {
 	echo "##  Setting up piadmin on Samba Server  ##" | tee -a $LOGFILE
 	echo "##########################################" | tee -a $LOGFILE
 
-	(echo "$piadminpasswd"; echo "$piadminpasswd") | smbpasswd -s -a piadmin | tee -a $LOGFILE
+	(echo "$piadminpasswd"; echo "$piadminpasswd") | sudo smbpasswd -a piadmin | tee -a $LOGFILE
 	sudo chmod 755 -R /smb_shares/slides/
 	sudo chmod -R 777 /smb_shares/watch_folder
 
@@ -545,42 +586,50 @@ rtmp {
 	echo "##################################################################" | tee -a $LOGFILE
 	echo "##  Setting up autologin variable in /etc/lightdm/lightdm.conf  ##" | tee -a $LOGFILE
 	echo "##################################################################" | tee -a $LOGFILE
-	sed -i 's/autologin-user=pi/#autologin-user=pi/' /etc/lightdm/lightdm.conf | tee -a $LOGFILE
+	sudo sed -i 's/autologin-user=$currentuser/#autologin-user=$currentuser/' /etc/lightdm/lightdm.conf | tee -a $LOGFILE
 	echo | tee -a $LOGFILE
 
 	
-	
+	if [ $dropbox_enabled -eq 0 ]; then
+ 	
 	echo "###########################################" | tee -a $LOGFILE
 	echo "##  Install/Syncing Dropbox with Server  ##" | tee -a $LOGFILE
 	echo "###########################################" | tee -a $LOGFILE
 	
-	echo $dropbox_access_token > /home/pi/.dropbox_uploader
+	echo $dropbox_access_token > /home/$currentuser/.dropbox_uploader
 	echo $dropbox_access_token > /root/.dropbox_uploader
-	chown pi:pi /home/pi/.dropbox_uploader
-	mkdir /home/pi/dropbox_media_slides/	
-	chown pi:pi /home/pi/dropbox_media_slides
+	chown $currentuser:$currentuser /home/$currentuser/.dropbox_uploader
+	mkdir /home/$currentuser/dropbox_media_slides/	
+	chown $currentuser:$currentuser /home/$currentuser/dropbox_media_slides
 	
 	echo "-- Begin Dropbox sync --" | tee -a $LOGFILE 
 	echo "" | tee -a $LOGFILE 
-	chown -R pi:pi /boot/pibroadcast-scripts/Dropbox-Uploader/
+	chown -R $currentuser:$currentuser `pwd`/pibroadcast-scripts/Dropbox-Uploader/
 	echo $USER : $UID | tee -a $LOGFILE
-	#sudo -H -u pi /boot/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/pi/dropbox_media_slides/ | tee -a $LOGFILE
-	/boot/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/pi/dropbox_media_slides/ | tee -a $LOGFILE
+	#sudo -H -u $currentuser `pwd`/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/$currentuser/dropbox_media_slides/ | tee -a $LOGFILE
+	`pwd`/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/$currentuser/dropbox_media_slides/ | tee -a $LOGFILE
 	echo "-- Syncing All Dropbox and Server Folders --" | tee -a $LOGFILE
-	rsync -avh --exclude=".*" /home/pi/dropbox_media_slides/ServerPi/ /smb_shares/slides/ --delete | tee -a $LOGFILE
-	sudo chmod -R 755 /home/pi/dropbox_media_slides/
+	rsync -avh --exclude=".*" /home/$currentuser/dropbox_media_slides/ServerPi/ /smb_shares/slides/ --delete | tee -a $LOGFILE
+	sudo chmod -R 755 /home/$currentuser/dropbox_media_slides/
 	sudo chmod 755 -R /smb_shares/slides/
 
-	printf 'log_upload true\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Server Settings File ##
+	printf 'log_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Server Settings File ##
+
+	fi
 
 	echo "#######################################################" | tee -a $LOGFILE
 	echo "##  Moving scripts folder from /boot and cleaning up ##" | tee -a $LOGFILE
 	echo "#######################################################" | tee -a $LOGFILE
-	mv /boot/pibroadcast-scripts/server_menu.sh /home/pi/server_menu.sh
-	chown -R pi:pi /home/pi
-	echo "sudo ~/server_menu.sh" >> /home/pi/.bashrc
-	mv /boot/pibroadcast-scripts/* /smb_shares/scripts/
-	rm -rf /boot/pibroadcast-scripts
+	echo "Working directory: "`pwd`		## Used for Troubleshooting ##
+	echo "Current user: " $currentuser	## Used for Troubleshooting ##
+	echo "Starting Install directory: " $starting_install_directory	
+
+	mv $starting_install_directory/pibroadcast-scripts/server_menu.sh /home/$currentuser/server_menu.sh
+	chown -R $currentuser:$currentuser /home/$currentuser
+	chmod +x /home/$currentuser/server_menu.sh	
+	echo "sudo ~/server_menu.sh" >> /home/$currentuser/.bashrc
+	mv $starting_install_directory/pibroadcast-scripts/ /smb_shares/scripts/
+	rm -rf `pwd`/pibroadcast-scripts
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
 
@@ -621,8 +670,8 @@ else	## For Clients ##
 	echo "################################################################" | tee -a $LOGFILE
 	echo "##  Create local directories to sync from server directories  ##"  | tee -a $LOGFILE
 	echo "################################################################" | tee -a $LOGFILE
-	mkdir -p /home/pi/local_sync/scripts | tee -a $LOGFILE
-	mkdir /home/pi/local_sync/slides | tee -a $LOGFILE
+	mkdir -p /home/$currentuser/local_sync/scripts | tee -a $LOGFILE
+	mkdir /home/$currentuser/local_sync/slides | tee -a $LOGFILE
 	echo | tee -a $LOGFILE
 
 
@@ -638,8 +687,8 @@ else	## For Clients ##
 	echo "############################################################" | tee -a $LOGFILE
 	echo "##  Setting up /etc/rc.local to start client_services.sh  ##" | tee -a $LOGFILE
 	echo "############################################################" | tee -a $LOGFILE
-	sed -i '/fi/a /home/pi/local_sync/scripts/client_services.sh & ' /etc/rc.local | tee -a $LOGFILE
-	cp /boot/pibroadcast-scripts/client_services.sh /home/pi/local_sync/scripts/client_services.sh | tee -a $LOGFILE  ## Added as a temp fix ##
+	sed -i '/fi/a /home/$currentuser/local_sync/scripts/client_services.sh & ' /etc/rc.local | tee -a $LOGFILE
+	cp `pwd`/pibroadcast/pibroadcast-scripts/client_services.sh /home/$currentuser/local_sync/scripts/client_services.sh | tee -a $LOGFILE  ## Added as a temp fix ##
 	echo | tee -a $LOGFILE
 
 
@@ -647,52 +696,52 @@ else	## For Clients ##
 	echo "##  Mount server directories and sync  ##"  | tee -a $LOGFILE
 	echo "#########################################" | tee -a $LOGFILE
 	mount -av | tee -a $LOGFILE
-	rsync -avh --exclude=".*" /server_folders/slides/ /home/pi/local_sync/slides/ | tee -a $LOGFILE
-	rsync -avh --exclude=".*" /server_folders/scripts/ /home/pi/local_sync/scripts/  | tee -a $LOGFILE
-	[ "$(ls -A /home/pi/local_sync/slides/)" ] && echo "/home/pi/local_sync/slides folder Not Empty" || mkdir /home/pi/local_sync/slides/Empty && cp /boot/pibroadcast-scripts/Default_Screen.jpg /home/pi/local_sync/slides/Empty/
+	rsync -avh --exclude=".*" /server_folders/slides/ /home/$currentuser/local_sync/slides/ | tee -a $LOGFILE
+	rsync -avh --exclude=".*" /server_folders/scripts/ /home/$currentuser/local_sync/scripts/  | tee -a $LOGFILE
+	[ "$(ls -A /home/$currentuser/local_sync/slides/)" ] && echo "/home/$currentuser/local_sync/slides folder Not Empty" || mkdir /home/$currentuser/local_sync/slides/Empty && cp `pwd`/pibroadcast-scripts/Default_Screen.jpg /home/$currentuser/local_sync/slides/Empty/
 	echo | tee -a $LOGFILE
 
 
 	echo "#############################################################################################" | tee -a $LOGFILE
-	echo "##  /home/pi/.config/lxsession/LXDE-pi/autostart to stop screensaver and clean up desktop  ##" | tee -a $LOGFILE
+	echo "##  /home/$currentuser/.config/lxsession/LXDE-pi/autostart to stop screensaver and clean up desktop  ##" | tee -a $LOGFILE
 	echo "#############################################################################################" | tee -a $LOGFILE
-	rm /home/pi/.config/lxsession/LXDE-pi/autostart  | tee -a $LOGFILE
-	mkdir -p /home/pi/.config/lxsession/LXDE-pi/ | tee -a $LOGFILE
-	touch /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@lxpanel --profile LXDE-pi" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@pcmanfm --desktop --profile LXDE-pi" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@point-rpi" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@unclutter" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@xset s 0 0" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@xset s noblank" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@xset s noexpose" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
-	echo "@xset dpms 0 0 0" >> /home/pi/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	rm /home/$currentuser/.config/lxsession/LXDE-pi/autostart  | tee -a $LOGFILE
+	mkdir -p /home/$currentuser/.config/lxsession/LXDE-pi/ | tee -a $LOGFILE
+	touch /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@lxpanel --profile LXDE-pi" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@pcmanfm --desktop --profile LXDE-pi" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@point-rpi" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@unclutter" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@xset s 0 0" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@xset s noblank" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@xset s noexpose" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
+	echo "@xset dpms 0 0 0" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
 	echo | tee -a $LOGFILE
 
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
 
-	mv /boot/pibroadcast-scripts/client_menu.sh /home/pi/.bashrc
-	chown pi:pi /home/pi/.bashrc
-	chown -R pi:pi /home/pi/
-	printf 'feh 10\nserver_sync true\nsync_scripts true\nsync_slides true\nbroadcast_watch true\nclient_pid_create true\nlog_upload true\n' >> /home/pi/.pibroadcast_settings  ## Setting Default Client Settings File ##
-	rm -rf /boot/pibroadcast-scripts
+	mv `pwd`/pibroadcast/pibroadcast-scripts/client_menu.sh /home/$currentuser/.bashrc
+	chown $currentuser:$currentuser /home/$currentuser/.bashrc
+	chown -R $currentuser:$currentuser /home/$currentuser/
+	printf 'feh 10\nserver_sync true\nsync_scripts true\nsync_slides true\nbroadcast_watch true\nclient_pid_create true\nlog_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Client Settings File ##
+	rm -rf `pwd`/pibroadcast/pibroadcast-scripts
 	
 
 fi
 
 echo | tee -a $LOGFILE
 
-rm /etc/profile.d/sshpasswd.sh | tee -a $LOGFILE  		##  Remove info popup about ssh and not changing pi passwd on command line  ##
+rm /etc/profile.d/sshpwd.sh | tee -a $LOGFILE  		##  Remove info popup about ssh and not changing pi passwd on command line  ##
 rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh | tee -a $LOGFILE  	##  Remove info popup about ssh and not changing pi passwd on GUI  ##
-rm /home/pi/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
+rm /home/$currentuser/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
 apt-get autoremove -y | tee -a $LOGFILE 			##  Doing a final cleanup of system before reboot  ##
 apt-get purge -y  						##  Doing a final cleanup of system before reboot  ##
-rm /boot/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
+#rm `pwd`/pibroadcast/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
 
 echo "###################" | tee -a $LOGFILE
 echo "##  Rebooting Pi ##"  | tee -a $LOGFILE
 echo "###################" | tee -a $LOGFILE
-reboot  | tee -a $LOGFILE
+#reboot  | tee -a $LOGFILE
 
 exit
