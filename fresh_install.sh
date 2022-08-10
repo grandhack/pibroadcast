@@ -6,8 +6,8 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.10
-#usage		:sudo /`pwd`/fresh_install.sh
+#version        :3.3.0 alpha.11
+#usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
 #==============================================================================
@@ -602,10 +602,10 @@ rtmp {
 	
 	echo "-- Begin Dropbox sync --" | tee -a $LOGFILE 
 	echo "" | tee -a $LOGFILE 
-	chown -R $currentuser:$currentuser /`pwd`/pibroadcast-scripts/Dropbox-Uploader/
+	chown -R $currentuser:$currentuser `pwd`/pibroadcast-scripts/Dropbox-Uploader/
 	echo $USER : $UID | tee -a $LOGFILE
-	#sudo -H -u $currentuser /`pwd`/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/$currentuser/dropbox_media_slides/ | tee -a $LOGFILE
-	/`pwd`/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/$currentuser/dropbox_media_slides/ | tee -a $LOGFILE
+	#sudo -H -u $currentuser `pwd`/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/$currentuser/dropbox_media_slides/ | tee -a $LOGFILE
+	`pwd`/pibroadcast-scripts/Dropbox-Uploader/dropbox_uploader.sh download /Media_Slides/ServerPi/ /home/$currentuser/dropbox_media_slides/ | tee -a $LOGFILE
 	echo "-- Syncing All Dropbox and Server Folders --" | tee -a $LOGFILE
 	rsync -avh --exclude=".*" /home/$currentuser/dropbox_media_slides/ServerPi/ /smb_shares/slides/ --delete | tee -a $LOGFILE
 	sudo chmod -R 755 /home/$currentuser/dropbox_media_slides/
@@ -626,7 +626,7 @@ rtmp {
 	chown -R $currentuser:$currentuser /home/$currentuser
 	echo "sudo ~/server_menu.sh" >> /home/$currentuser/.bashrc
 	mv $starting_install_directory/pibroadcast-scripts/ /smb_shares/scripts/
-	rm -rf /`pwd`/pibroadcast-scripts
+	rm -rf `pwd`/pibroadcast-scripts
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
 
@@ -685,7 +685,7 @@ else	## For Clients ##
 	echo "##  Setting up /etc/rc.local to start client_services.sh  ##" | tee -a $LOGFILE
 	echo "############################################################" | tee -a $LOGFILE
 	sed -i '/fi/a /home/$currentuser/local_sync/scripts/client_services.sh & ' /etc/rc.local | tee -a $LOGFILE
-	cp /`pwd`/pibroadcast-scripts/client_services.sh /home/$currentuser/local_sync/scripts/client_services.sh | tee -a $LOGFILE  ## Added as a temp fix ##
+	cp `pwd`/pibroadcast-scripts/client_services.sh /home/$currentuser/local_sync/scripts/client_services.sh | tee -a $LOGFILE  ## Added as a temp fix ##
 	echo | tee -a $LOGFILE
 
 
@@ -695,7 +695,7 @@ else	## For Clients ##
 	mount -av | tee -a $LOGFILE
 	rsync -avh --exclude=".*" /server_folders/slides/ /home/$currentuser/local_sync/slides/ | tee -a $LOGFILE
 	rsync -avh --exclude=".*" /server_folders/scripts/ /home/$currentuser/local_sync/scripts/  | tee -a $LOGFILE
-	[ "$(ls -A /home/$currentuser/local_sync/slides/)" ] && echo "/home/$currentuser/local_sync/slides folder Not Empty" || mkdir /home/$currentuser/local_sync/slides/Empty && cp /`pwd`/pibroadcast-scripts/Default_Screen.jpg /home/$currentuser/local_sync/slides/Empty/
+	[ "$(ls -A /home/$currentuser/local_sync/slides/)" ] && echo "/home/$currentuser/local_sync/slides folder Not Empty" || mkdir /home/$currentuser/local_sync/slides/Empty && cp `pwd`/pibroadcast-scripts/Default_Screen.jpg /home/$currentuser/local_sync/slides/Empty/
 	echo | tee -a $LOGFILE
 
 
@@ -718,11 +718,11 @@ else	## For Clients ##
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
 
-	mv /`pwd`/pibroadcast-scripts/client_menu.sh /home/$currentuser/.bashrc
+	mv `pwd`/pibroadcast-scripts/client_menu.sh /home/$currentuser/.bashrc
 	chown $currentuser:$currentuser /home/$currentuser/.bashrc
 	chown -R $currentuser:$currentuser /home/$currentuser/
 	printf 'feh 10\nserver_sync true\nsync_scripts true\nsync_slides true\nbroadcast_watch true\nclient_pid_create true\nlog_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Client Settings File ##
-	rm -rf /`pwd`/pibroadcast-scripts
+	rm -rf `pwd`/pibroadcast-scripts
 	
 
 fi
@@ -734,7 +734,7 @@ rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh | tee -a $LOGFILE  	##  Remove info popu
 rm /home/$currentuser/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
 apt-get autoremove -y | tee -a $LOGFILE 			##  Doing a final cleanup of system before reboot  ##
 apt-get purge -y  						##  Doing a final cleanup of system before reboot  ##
-#rm /`pwd`/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
+#rm `pwd`/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
 
 echo "###################" | tee -a $LOGFILE
 echo "##  Rebooting Pi ##"  | tee -a $LOGFILE
