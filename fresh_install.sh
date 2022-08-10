@@ -698,14 +698,14 @@ else	## For Clients ##
 	mount -av | tee -a $LOGFILE
 	rsync -avh --exclude=".*" /server_folders/slides/ /home/$currentuser/local_sync/slides/ | tee -a $LOGFILE
 	rsync -avh --exclude=".*" /server_folders/scripts/ /home/$currentuser/local_sync/scripts/  | tee -a $LOGFILE
-	[ "$(ls -A /home/$currentuser/local_sync/slides/)" ] && echo "/home/$currentuser/local_sync/slides folder Not Empty" || mkdir /home/$currentuser/local_sync/slides/Empty && cp `pwd`/pibroadcast-scripts/Default_Screen.jpg /home/$currentuser/local_sync/slides/Empty/
+	[ "$(ls -A /home/$currentuser/local_sync/slides/)" ] && echo "/home/$currentuser/local_sync/slides folder Not Empty" || mkdir /home/$currentuser/local_sync/slides/Empty && cp `pwd`/pibroadcast/pibroadcast-scripts/Default_Screen.jpg /home/$currentuser/local_sync/slides/Empty/
 	echo | tee -a $LOGFILE
 
 
 	echo "#############################################################################################" | tee -a $LOGFILE
 	echo "##  /home/$currentuser/.config/lxsession/LXDE-pi/autostart to stop screensaver and clean up desktop  ##" | tee -a $LOGFILE
 	echo "#############################################################################################" | tee -a $LOGFILE
-	rm /home/$currentuser/.config/lxsession/LXDE-pi/autostart  | tee -a $LOGFILE
+	rm -rf /home/$currentuser/.config/lxsession/LXDE-pi  | tee -a $LOGFILE
 	mkdir -p /home/$currentuser/.config/lxsession/LXDE-pi/ | tee -a $LOGFILE
 	touch /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
 	echo "@lxpanel --profile LXDE-pi" >> /home/$currentuser/.config/lxsession/LXDE-pi/autostart | tee -a $LOGFILE
