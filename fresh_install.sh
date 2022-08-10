@@ -5,8 +5,8 @@
 #title          :fresh_install.sh
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
-#date           :Aug 9 2022
-#version        :3.3.0 alpha.4
+#date           :Aug 10 2022
+#version        :3.3.0 alpha.5
 #usage		:sudo /`pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -559,7 +559,7 @@ rtmp {
 	echo "##  Setting up piadmin on Samba Server  ##" | tee -a $LOGFILE
 	echo "##########################################" | tee -a $LOGFILE
 
-	(echo "$piadminpasswd"; echo "$piadminpasswd") | sudo -a smbpasswd piadmin | tee -a $LOGFILE
+	(echo "$piadminpasswd"; echo "$piadminpasswd") | sudo smbpasswd -a piadmin | tee -a $LOGFILE
 	sudo chmod 755 -R /smb_shares/slides/
 	sudo chmod -R 777 /smb_shares/watch_folder
 
