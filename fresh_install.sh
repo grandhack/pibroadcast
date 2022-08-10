@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.5
+#version        :3.3.0 alpha.8
 #usage		:sudo /`pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -59,7 +59,11 @@ piadminpasswd="pibroadcast"
 serveruser="piadmin"
 serveruserpasswd="pibroadcast"
 
+starting_install_directory=`pwd`
 
+## Used for troubleshooting ##
+echo Starting Install Directory: $starting_install_directory
+## Used for troubleshooting ##
 
 
 export LANG=en_US.UTF-8
@@ -72,7 +76,7 @@ export LC_TELEPHONE=en_US.UTF-8
 export LC_MEASUREMENT=en_US.UTF-8
 export LC_IDENTIFICATION=en_US.UTF-8
 export LC_ALL=C
-currentuser=`piadmin`
+currentuser="piadmin"
 
 
 echo "#####################################" | tee -a $LOGFILE
@@ -222,6 +226,7 @@ do
 	        esac
 done
 
+
 echo "#############################################" >> $LOGFILE 2>&1
 echo "##  Start/Enable/Edit ssh/sudo on boot up  ##" | tee -a $LOGFILE
 echo "#############################################" >> $LOGFILE 2>&1
@@ -272,7 +277,6 @@ cp /usr/share/zoneinfo/America/New_York /etc/localtime | tee -a $LOGFILE
 echo | tee -a $LOGFILE
 
 
-
 echo "####################################" | tee -a $LOGFILE
 echo "##  Change/Create pi/piadmin user ##" | tee -a $LOGFILE
 echo "####################################" | tee -a $LOGFILE
@@ -280,7 +284,7 @@ echo "Creating piadmin user" >> $LOGFILE
 sudo useradd -m -G sudo -p $(echo $piadminpasswd | openssl passwd -1 -stdin) -s /bin/bash piadmin | tee -a $LOGFILE
 echo "Changing $currentuser user password" >> $LOGFILE
 sudo usermod --password $pipasswd $currentuser | tee -a $LOGFILE
-Echo "$currentuser:$pipasswd" | sudo chpasswd
+echo "$currentuser:$pipasswd" | sudo chpasswd
 echo | tee -a $LOGFILE
 
 echo "###############################################" | tee -a $LOGFILE
@@ -331,6 +335,13 @@ if [ $opt = ServerPi ]; then
 	mkdir /home/$currentuser/install-packages | tee -a $LOGFILE
 	printf 'pibroadcast_version 1.3.1\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Settings File ##
 	printf 'log_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Settings File ##
+
+
+	## Used for Troubleshooting ##
+	echo "################################"
+	echo "## Current User: $currentuser ##"
+	echo "################################"
+	## Used for Troubleshooting ##
 
 	echo "#####################" | tee -a $LOGFILE
 	echo "##  nginx Install  ##" | tee -a $LOGFILE
@@ -486,6 +497,12 @@ rtmp {
 	cd /home/$currentuser
 	rm -rf /home/$currentuser/nginx-build
 	
+	## Used for Troubleshooting ##
+	echo "################################"
+	echo "## Current User: $currentuser ##"
+	echo "################################"
+	## Used for Troubleshooting ##
+
 	#echo "######################" | tee -a $LOGFILE
 	#echo "##  Webmin Install  ##" | tee -a $LOGFILE
 	#echo "######################" | tee -a $LOGFILE
@@ -601,12 +618,15 @@ rtmp {
 	echo "#######################################################" | tee -a $LOGFILE
 	echo "##  Moving scripts folder from /boot and cleaning up ##" | tee -a $LOGFILE
 	echo "#######################################################" | tee -a $LOGFILE
-	echo "Working directory: "`pwd`	
-	mv /`pwd`/$currentuser/pibroadcast-scripts/server_menu.sh /home/$currentuser/server_menu.sh
+	echo "Working directory: "`pwd`		## Used for Troubleshooting ##
+	echo "Current user: " $currentuser	## Used for Troubleshooting ##
+	echo "Starting Install directory: " $starting_install_directory	
+
+	mv /$starting_install_directory/pibroadcast-scripts/server_menu.sh /home/$currentuser/server_menu.sh
 	chown -R $currentuser:$currentuser /home/$currentuser
 	echo "sudo ~/server_menu.sh" >> /home/$currentuser/.bashrc
-	mv /`pwd`/$currentuser/pibroadcast-scripts/* /smb_shares/scripts/
-	rm -rf /`pwd`/$currentuser/pibroadcast-scripts
+	mv /$starting_install_directory/pibroadcast-scripts/* /smb_shares/scripts/
+	rm -rf /`pwd`/pibroadcast-scripts
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
 
