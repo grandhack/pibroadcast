@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.15
+#version        :3.3.0 alpha.16
 #usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -628,7 +628,7 @@ rtmp {
 	chown -R $currentuser:$currentuser /home/$currentuser
 	chmod +x /home/$currentuser/server_menu.sh	
 	echo "sudo ~/server_menu.sh" >> /home/$currentuser/.bashrc
-	mv $starting_install_directory/pibroadcast-scripts/ /smb_shares/scripts/
+	mv $starting_install_directory/pibroadcast/pibroadcast-scripts/ /smb_shares/scripts/
 	rm -rf `pwd`/pibroadcast-scripts
 	mkdir /home/piadmin/pibroadcast_update
 	chmod 777 /home/piadmin/pibroadcast_update
