@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.17
+#version        :3.3.0 alpha.18
 #usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
