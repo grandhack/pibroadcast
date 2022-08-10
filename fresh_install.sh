@@ -734,7 +734,7 @@ echo | tee -a $LOGFILE
 
 rm /etc/profile.d/sshpwd.sh | tee -a $LOGFILE  		##  Remove info popup about ssh and not changing pi passwd on command line  ##
 rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh | tee -a $LOGFILE  	##  Remove info popup about ssh and not changing pi passwd on GUI  ##
-rm /home/$currentuser/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
+#rm /home/$currentuser/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
 apt-get autoremove -y | tee -a $LOGFILE 			##  Doing a final cleanup of system before reboot  ##
 apt-get purge -y  						##  Doing a final cleanup of system before reboot  ##
 #rm `pwd`/fresh_install.sh					##  Doing a final cleanup of system before reboot  ##
