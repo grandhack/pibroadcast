@@ -6,7 +6,7 @@
 #description    :This script is used on first boot to configure a server/client
 #author		:Justin Holt - githubjh@gmail.com
 #date           :Aug 10 2022
-#version        :3.3.0 alpha.12
+#version        :3.3.0 alpha.13
 #usage		:sudo `pwd`/fresh_install.sh
 #notes          :
 #log file	:/var/log/pibroadcast-install.log
@@ -730,7 +730,7 @@ fi
 
 echo | tee -a $LOGFILE
 
-rm /etc/profile.d/sshpasswd.sh | tee -a $LOGFILE  		##  Remove info popup about ssh and not changing pi passwd on command line  ##
+rm /etc/profile.d/sshpwd.sh | tee -a $LOGFILE  		##  Remove info popup about ssh and not changing pi passwd on command line  ##
 rm /etc/xdg/lxsession/LXDE-pi/sshpwd.sh | tee -a $LOGFILE  	##  Remove info popup about ssh and not changing pi passwd on GUI  ##
 rm /home/$currentuser/.config/autostart/pi-conf-backup.desktop | tee -a $LOGFILE  ## Remove update info pop up after system restart  ##
 apt-get autoremove -y | tee -a $LOGFILE 			##  Doing a final cleanup of system before reboot  ##
