@@ -725,7 +725,7 @@ else	## For Clients ##
 	chown $currentuser:$currentuser /home/$currentuser/.bashrc
 	chown -R $currentuser:$currentuser /home/$currentuser/
 	printf 'feh 10\nserver_sync true\nsync_scripts true\nsync_slides true\nbroadcast_watch true\nclient_pid_create true\nlog_upload true\n' >> /home/$currentuser/.pibroadcast_settings  ## Setting Default Client Settings File ##
-	rm -rf `pwd`/pibroadcast-scripts
+	rm -rf `pwd`/pibroadcast/pibroadcast-scripts
 	
 
 fi
